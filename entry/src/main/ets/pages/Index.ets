@@ -12,6 +12,63 @@ struct Index {
   '13.2 公里' }, { title: '气压', value:
   '1037 hPa' }, { title: '露点', value:
   '-7 °' }]
+  @State last10Day: Array<object> = [{
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '25日周一',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '今晚',
+    weather:
+    '晴朗',
+    feelTemperature: "27",
+    temperature: "1",
+    rainfall: "10%"
+  }]
   @State temperature: string = '1'
   @State feelTemperature: string = '-7'
 
@@ -40,9 +97,41 @@ struct Index {
             ItemComponent({ list: this.columns })
 
             Card({ leftTitle: '10 日预告', rightTitle: '每小时预报 >' }) {
-              Text('添加子组件aaa') // 添加子组件
-                .fontSize(20)
-                .backgroundColor(Color.Pink)
+              List() { // List默认竖直方向排列子组件
+                ForEach(this.last10Day, (item: any, index?: number) => {
+                  ListItem() {
+                    Column() {
+                      Text(item.date)
+                        .fontSize(20)
+                        .fontWeight(700)
+                        .fontColor("#fff")
+                        .width('100%')
+                        .textAlign(TextAlign.Center)
+                        .height("20%")
+                      Image($r("app.media.ClearNightV3"))
+                        .height('20%')
+                      Text(item.feelTemperature ? item.feelTemperature : "--")
+                        .fontSize(20)
+                        .fontWeight(700)
+                        .textAlign(TextAlign.Center)
+                        .fontColor("#fff")
+                        .height('20%')
+                      Text(item.temperature ? item.temperature : "--")
+                        .fontSize(20)
+                        .fontWeight(700)
+                        .textAlign(TextAlign.Center)
+                        .fontColor("#fff")
+                        .height('20%')
+                      Text(item.rainfall ? item.rainfall : "--")
+                        .fontSize(20)
+                        .fontWeight(700)
+                        .textAlign(TextAlign.Center)
+                        .fontColor("#fff")
+                        .height('20%')
+                    }.height("100%").width("25%")
+                  }.height("100%")
+                })
+              }.width("100%").listDirection(Axis.Horizontal).borderRadius({ bottomRight: 10, bottomLeft: 10 })
             }
 
             Card({ leftTitle: '日出日落和月相' }) {
@@ -191,12 +280,12 @@ struct Card {
 
       Row() {
         this.child()
-      }.width("100%").height(20)
+      }.width("100%").height(250)
     }
     .width("100%")
     .height(300)
-    .backgroundColor("#fff")
-    .opacity(0.15)
+    .backgroundColor("#000")
+    // .opacity(0.15)
     .borderRadius(10)
     .margin({ bottom: 10 })
   }
@@ -249,7 +338,7 @@ struct Radios {
           })
       }
 
-    }.width(100).height(40).backgroundColor(Color.Gray).borderRadius(4)
+    }.width(100).height(35).backgroundColor(Color.Gray).borderRadius(4)
   }
 }
 
