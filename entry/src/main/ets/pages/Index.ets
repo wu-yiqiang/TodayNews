@@ -1,4 +1,9 @@
 import router from '@ohos.router'
+// import { getData } from '../utils/request'
+import http from '@ohos.net.http';
+import RequestMethod from '@ohos.net.http';
+import ResponseCode from '@ohos.net.http';
+
 
 @Entry
 @Component
@@ -16,14 +21,28 @@ struct Index {
     date: '今晚',
     weather:
     '晴朗',
-    feelTemperature: "27",
-    temperature: "1",
+    feelTemperature: "27°C",
+    temperature: "1°",
     rainfall: "10%"
   }, {
     date: '25日周一',
     weather:
     '晴朗',
-    feelTemperature: "27",
+    feelTemperature: "28°C",
+    temperature: "121°",
+    rainfall: "10%"
+  }, {
+    date: '26日周二',
+    weather:
+    '晴朗',
+    feelTemperature: "29°C",
+    temperature: "1",
+    rainfall: "10%"
+  }, {
+    date: '27日周三',
+    weather:
+    '晴朗',
+    feelTemperature: "300°C",
     temperature: "1",
     rainfall: "10%"
   }, {
@@ -34,21 +53,7 @@ struct Index {
     temperature: "1",
     rainfall: "10%"
   }, {
-    date: '今晚',
-    weather:
-    '晴朗',
-    feelTemperature: "27",
-    temperature: "1",
-    rainfall: "10%"
-  }, {
-    date: '今晚',
-    weather:
-    '晴朗',
-    feelTemperature: "27",
-    temperature: "1",
-    rainfall: "10%"
-  }, {
-    date: '今晚',
+    date: '31日周三',
     weather:
     '晴朗',
     feelTemperature: "27",
@@ -69,7 +74,7 @@ struct Index {
     temperature: "1",
     rainfall: "10%"
   }]
-  @State temperature: string = '1'
+  @State temperature: string = '1°C'
   @State feelTemperature: string = '-7'
 
   build() {
@@ -79,7 +84,7 @@ struct Index {
           Image($r("app.media.logo")).height("100%")
           Radios()
         }.height("100%")
-      }.width("100%").height(80).backgroundColor("rgb(29,40,50)").padding(10)
+      }.width("100%").height(70).backgroundColor("rgb(29,40,50)").padding(10)
 
       Row() {
         Scroll() {
@@ -87,7 +92,7 @@ struct Index {
             Location({ location: this.location })
             Row() {
               Text(this.time) // 子组件的高度小于Scroll高度，不会触发滚动
-                .fontSize(20)
+                .fontSize(24)
                 .size({ width: "100%", height: 40 }).fontColor('#f0f0f0')
 
             }
@@ -97,60 +102,169 @@ struct Index {
             ItemComponent({ list: this.columns })
 
             Card({ leftTitle: '10 日预告', rightTitle: '每小时预报 >' }) {
-              List() { // List默认竖直方向排列子组件
-                ForEach(this.last10Day, (item: any, index?: number) => {
-                  ListItem() {
-                    Column() {
-                      Text(item.date)
-                        .fontSize(20)
-                        .fontWeight(700)
-                        .fontColor("#fff")
-                        .width('100%')
-                        .textAlign(TextAlign.Center)
-                        .height("20%")
-                      Image($r("app.media.ClearNightV3"))
-                        .height('20%')
-                      Text(item.feelTemperature ? item.feelTemperature : "--")
-                        .fontSize(20)
-                        .fontWeight(700)
-                        .textAlign(TextAlign.Center)
-                        .fontColor("#fff")
-                        .height('20%')
-                      Text(item.temperature ? item.temperature : "--")
-                        .fontSize(20)
-                        .fontWeight(700)
-                        .textAlign(TextAlign.Center)
-                        .fontColor("#fff")
-                        .height('20%')
-                      Text(item.rainfall ? item.rainfall : "--")
-                        .fontSize(20)
-                        .fontWeight(700)
-                        .textAlign(TextAlign.Center)
-                        .fontColor("#fff")
-                        .height('20%')
-                    }.height("100%").width("25%")
-                  }.height("100%")
-                })
-              }.width("100%").listDirection(Axis.Horizontal).borderRadius({ bottomRight: 10, bottomLeft: 10 })
+              WeatherForecast({ list: this.last10Day })
             }
 
             Card({ leftTitle: '日出日落和月相' }) {
-              Text('添加子组件aaa') // 添加子组件
-                .fontSize(20)
-                .backgroundColor(Color.Pink)
+              Column() {
+                Row() {
+                  Flex({
+                    direction: FlexDirection.Row,
+                    justifyContent: FlexAlign.Center,
+                    alignItems: ItemAlign.Center
+                  }) {
+                    Row() {
+
+                      Flex({
+                        direction: FlexDirection.Row,
+                        justifyContent: FlexAlign.Center,
+                        alignItems: ItemAlign.Center
+                      }) {
+                        Image($r("app.media.sun")).width(40).margin({ right: 5 })
+                        Flex({
+                          direction: FlexDirection.Column,
+                          justifyContent: FlexAlign.Center,
+                          alignItems: ItemAlign.Start
+                        }) {
+                          Text("紫外线指数").fontColor("#fff").fontSize(18)
+                          Text("2•低").fontColor("#fff").fontSize(20).fontWeight(700)
+                        }.margin({ left: 5 })
+
+                      }
+                    }.width("50%").height(100)
+
+                    Row() {
+                      Flex({
+                        direction: FlexDirection.Row,
+                        justifyContent: FlexAlign.Center,
+                        alignItems: ItemAlign.Center
+                      }) {
+                        Image($r("app.media.moon")).width(40).margin({ right: 5 })
+                        Flex({
+                          direction: FlexDirection.Column,
+                          justifyContent: FlexAlign.Center,
+                          alignItems: ItemAlign.Start
+                        }) {
+                          Text("月相").fontColor("#fff").fontSize(18)
+                          Text("凸盈月").fontColor("#fff").fontSize(20).fontWeight(700)
+                        }.margin({ left: 5 })
+
+                      }
+                    }.width("50%").height(80)
+                  }
+
+                }.width("100%")
+
+                Row() {
+                  Text("10小时57分").fontSize(20).fontWeight(700).fontColor("#fff")
+                }.margin({ bottom: 10 })
+
+                Row() {
+
+                  Column() {
+                    Progress({
+                      value: 70, // 设置当前进度
+                      total: 100, // 设置进度总量
+                      type: ProgressType.Eclipse, // 设置进度条的样式为圆形样式
+                    })
+                      .size({ width: 100, height: 100 }).color("#f28d00").backgroundColor("#e6e6e6")
+                    Flex({
+                      direction: FlexDirection.Row,
+                      justifyContent: FlexAlign.SpaceBetween,
+                    }) {
+                      Column() {
+                        Text("日出").fontColor("#fff").fontSize(16)
+                        Text("06:50").fontColor("#fff").fontSize(18).fontWeight(700)
+                      }
+
+                      Column() {
+                        Text("日落").fontColor("#fff").fontSize(16)
+                        Text("16:57").fontColor("#fff").fontSize(18).fontWeight(700)
+                      }
+                    }.width(100).margin({ top: 10 })
+                  }
+                }
+
+              }.height("100%")
             }
 
           }
-          // .backgroundColor('#aabbcc')
           .padding(10)
 
         }.width("100%")
-      }.width('100%').backgroundImage($r('app.media.CloudyNight')).backgroundImageSize({ width: "100%" })
+      }
+      .width('100%')
+      .padding({ bottom: 60 })
+      .backgroundImage($r('app.media.CloudyNight'))
+      .backgroundImageSize({ width: "100%" })
 
     }.width("100%")
   }
+
+  aboutToAppear() {
+    // let httpRequest = http.createHttp()
+    // let url = 'https://api.vvhan.com/api/weather?city=上海市'
+    // httpRequest.request(url,
+    //   {
+    //     method: http.RequestMethod.GET,
+    //     header: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //   },
+    //   (err, data) => {
+    //     // 处理数据
+    //     console.log('sss121324333', err, JSON.parse(`${data}`))
+    //     if (!err) {
+    //       var datas = JSON.parse(`${data}`).city
+    //       console.log('sss', datas)
+    //     }
+    //   })
+  }
 }
 
+@Component
+struct WeatherForecast {
+  list: Array<object> = []
+
+  build() {
+    List() { // List默认竖直方向排列子组件
+      ForEach(this.list, (item: any, index?: number) => {
+        ListItem() {
+          Column() {
+            Text(item.date)
+              .fontSize(18)
+              .fontWeight(700)
+              .fontColor("#fff")
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .height("20%")
+            Image($r("app.media.ClearNightV3"))
+              .height('20%')
+            Text(item.feelTemperature ? item.feelTemperature : "--")
+              .fontSize(18)
+              .fontWeight(700)
+              .textAlign(TextAlign.Center)
+              .fontColor("#fff")
+              .height('20%')
+            Text(item.temperature ? item.temperature : "--")
+              .fontSize(18)
+              .fontWeight(700)
+              .textAlign(TextAlign.Center)
+              .fontColor("#fff")
+              .height('20%')
+            Text(item.rainfall ? item.rainfall : "--")
+              .fontSize(18)
+              .fontWeight(700)
+              .textAlign(TextAlign.Center)
+              .fontColor("#fff")
+              .height('20%')
+          }.height("100%").width("25%")
+        }.height("100%")
+      })
+    }.width("100%").listDirection(Axis.Horizontal).borderRadius({ bottomRight: 10, bottomLeft: 10 })
+
+  }
+}
 
 @Component
 struct ItemComponent {
@@ -229,20 +343,23 @@ struct Weather {
 
   build() {
     Row() {
-      Image($r("app.media.ClearNight")).height(80).margin({ right: 30 })
-      Text(this.Temperature).fontSize(60).fontColor("#fff")
-      Text("°C").fontSize(50).fontColor("#fff").margin({ right: 20 })
-      Column() {
-        Flex({
-          direction: FlexDirection.Column,
-          alignContent: FlexAlign.Start
-        }) {
-          Text("晴朗").fontSize(30).fontColor("#fff").fontWeight(700)
-          Text(`体感温度 ${this.FeelTemperature}°`).fontSize(20).fontColor("#fff")
+      Flex({
+        direction: FlexDirection.Row,
+        justifyContent: FlexAlign.SpaceBetween,
+        alignItems: ItemAlign.Center
+      }) {
+        Image($r("app.media.ClearNight")).height(100)
+        Text(this.Temperature).fontSize(70).fontColor("#fff").textAlign(TextAlign.Center)
+        Column() {
+          Flex({
+            direction: FlexDirection.Column,
+            alignContent: FlexAlign.Start
+          }) {
+            Text("晴朗").fontSize(30).fontColor("#fff").fontWeight(700)
+            Text(`体感温度 ${this.FeelTemperature}°`).fontSize(20).fontColor("#fff")
+          }
         }
-
       }
-
     }.width("100%")
   }
 }
@@ -274,18 +391,20 @@ struct Card {
       .width("100%")
       .border({
         width: { bottom: 1 },
-        color: '#ffffff',
+        color: Color.White,
         style: BorderStyle.Solid,
       })
 
       Row() {
         this.child()
-      }.width("100%").height(250)
+      }.width("100%").height(290)
     }
     .width("100%")
-    .height(300)
-    .backgroundColor("#000")
-    // .opacity(0.15)
+    .height(340)
+    // .backgroundColor("#fff")
+    // .opacity(0.1)
+    .backdropBlur(10)
+    .shadow({ radius: 10 })
     .borderRadius(10)
     .margin({ bottom: 10 })
   }
